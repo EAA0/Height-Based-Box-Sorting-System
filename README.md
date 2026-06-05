@@ -4,6 +4,14 @@ A PLC-controlled sorting system that automatically separates boxes by height ont
 
 ---
 
+## Demo
+
+[▶ Watch the demo video](https://drive.google.com/file/d/1kCXuybAtfKXwHFnfI3lJmANSGafFeYZG/view?usp=sharing)
+
+A short video showing the system sorting tall and short boxes in real time.
+
+---
+
 ## What it does
 
 Boxes travel on pallets toward a chain-transfer sorting station. As each box passes a set of height sensors, the controller determines whether it is tall or short and fires the chain transfer to push it onto the correct lane:
@@ -11,7 +19,7 @@ Boxes travel on pallets toward a chain-transfer sorting station. As each box pas
 - **Tall boxes are sorted to the right**
 - **Short boxes are sorted to the left**
 
-The system runs the full cycle automatically feeding boxes in, measuring them, making the sorting decision, diverting them, and bringing in the next box. A significant part of the design went into reliable sequencing so that boxes don't jam or collide at the sorting point.
+The system runs the full cycle automatically — feeding boxes in, measuring them, making the sorting decision, diverting them, and bringing in the next box. A significant part of the design went into reliable sequencing so that boxes don't jam or collide at the sorting point.
 
 ---
 
@@ -26,6 +34,8 @@ The system runs the full cycle automatically feeding boxes in, measuring them, m
 - **Modbus TCP** links the two, letting the controller read the sensors and drive the actuators.
 
 The simulation uses the "Sorting by Height" scene in Factory I/O.
+
+![Factory I/O Modbus driver mapping](Drivers.png)
 
 ---
 
@@ -55,6 +65,8 @@ The simulation uses the "Sorting by Height" scene in Factory I/O.
 
 **Internal memory bits:** `highsensor_memorybit` and `lowsensor_memorybit` are used to retain the height decision (explained below).
 
+![PLC variable table](PLC%20variables.png)
+
 ---
 
 ## How the control logic works
@@ -75,6 +87,16 @@ The program is organized into separate rungs, each handling one stage of the pro
 
 **Reset.** When the box reaches its lane, the transfer switches off and the height memory clears, leaving the system ready for the next box.
 
+### Ladder logic
+
+![Rungs 1, 2, 3](rungs%201,2,3.png)
+
+![Rungs 4, 5, 6, 7](rungs%204,5,6,7.png)
+
+![Rungs 8, 9, 10, 11](rungs%208,9,10,11.png)
+
+![Rungs 12, 13](rungs%2012,13.png)
+
 ---
 
 ## Key design decisions
@@ -85,7 +107,7 @@ A few problems required deliberate solutions, and these are the parts of the des
 The height sensors only see a box briefly as it passes. By the time the box is in position to be sorted, the sensors no longer detect it, so the controller can't react to them directly at that point. The solution was to capture the box's height into a memory bit the moment it's detected and hold that state until the box is sorted. This is what allows the correct decision to be applied later in the cycle.
 
 **Distinguishing short boxes from empty pallets.**
-A short box is identified as the low sensor being active while the high sensor is not rather than simply assuming "not tall means short." Requiring confirmation that a box is actually present prevents an empty pallet from being sorted by mistake, keeping the logic consistent for a real life use case scenario.
+A short box is identified as the low sensor being active while the high sensor is not — rather than simply assuming "not tall means short." Requiring confirmation that a box is actually present prevents an empty pallet from being sorted by mistake, keeping the logic consistent for a real-life use case.
 
 **Eliminating jamming with latched transfers.**
 Driving the transfer directly from a sensor caused boxes to jam, because the transfer stopped the moment the box moved off the sensor. The fix was to latch the transfer on when the sorting decision is made and switch it off only once the box has confirmed arrival on the lane, so the push always completes.
@@ -93,20 +115,14 @@ Driving the transfer directly from a sensor caused boxes to jam, because the tra
 **Acting once per box with edge detection.**
 A normal contact stays active the whole time a sensor sees a box, which can cause an action to repeat over and over while the box sits in front of the sensor. To avoid this, I used edge triggers (R_TRIG / F_TRIG), which respond only at the moment a sensor switches on or off rather than the whole time it's active. This makes each action happen exactly once per box.
 
-## Tools and concepts
-
-- **OpenPLC** : open-source PLC editor and runtime (Ladder Logic, IEC 61131-3)
-- **Factory I/O** : 3D industrial simulation
-- **Modbus TCP** : communication protocol between controller and simulation
-- Ladder Logic concepts applied: Set/Reset coils, normally-open and normally-closed contacts, rising/falling edge triggers (R_TRIG / F_TRIG), internal memory bits, and sequential interlocking
-
 ---
 
-## Demo
+## Tools and concepts
 
-A short video demonstrating the system sorting tall and short boxes in real time is included with this project.
-
-*https://drive.google.com/file/d/1kCXuybAtfKXwHFnfI3lJmANSGafFeYZG/view?usp=sharing*
+- **OpenPLC** — open-source PLC editor and runtime (Ladder Logic, IEC 61131-3)
+- **Factory I/O** — 3D industrial simulation
+- **Modbus TCP** — communication protocol between controller and simulation
+- Ladder Logic concepts applied: Set/Reset coils, normally-open and normally-closed contacts, rising/falling edge triggers (R_TRIG / F_TRIG), internal memory bits, and sequential interlocking
 
 ---
 
