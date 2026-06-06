@@ -6,7 +6,7 @@ A PLC-controlled sorting system that automatically separates boxes by height ont
 
 ## Demo
 
-[▶ Watch the demo video](https://drive.google.com/file/d/1kCXuybAtfKXwHFnfI3lJmANSGafFeYZG/view?usp=sharing)
+[ Watch the demo video](https://drive.google.com/file/d/1kCXuybAtfKXwHFnfI3lJmANSGafFeYZG/view?usp=sharing)
 
 A short video showing the system sorting tall and short boxes in real time.
 
