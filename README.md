@@ -126,6 +126,18 @@ A normal contact stays active the whole time a sensor sees a box, which can caus
 
 ---
 
+## Project files
+
+- `SortByHightPlc.xml` — the OpenPLC ladder logic program
+
+**To run it:**
+1. Import `SortByHightPlc.xml` into OpenPLC Editor.
+2. In Factory I/O, load the built-in **"Sorting by Height (Basic)"** scene.
+3. Set the Factory I/O driver to **Modbus TCP/IP Server**.
+4. Connect OpenPLC to the runtime, upload the program, and start it. The system will begin sorting automatically.
+
+---
+
 ## Author
 
 **Ebrahim Aljabban** — Mechatronics Engineering
